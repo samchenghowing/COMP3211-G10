@@ -1,6 +1,6 @@
-package comp3211_group10_2023_fall;
+package model;
 
-public class Event extends PIR implements ManagePIR {
+public class Note extends PIR implements ManagePIR {
 
 	@Override
 	public void create() {
