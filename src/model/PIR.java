@@ -8,4 +8,8 @@ public class PIR {
 		// TODO Auto-generated method stub
 		// testig
 	}
+
+	public void search(String searchStr) {
+		// TODO Auto-generated method stub
+	}
 }
