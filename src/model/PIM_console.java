@@ -24,10 +24,10 @@ public class PIM_console {
 		
 		if(debug) {
 			userName = "Alice";
-			filePath = "./src/model/Alice.pim";
-			writeDefaultData(filePath);
+			filePath = "./";
+			writeDefaultData(filePath, userName);
 		}
-		PIRs = loadUserPIRs(userName);
+		PIRs = loadPIRs(filePath, userName);
 		if (PIRs == null) {} // user not exist 
 		
 		int option = -1;
@@ -35,11 +35,10 @@ public class PIM_console {
 			System.out.println("--------------Menu--------------"
 					+ "\nWhich option you want to perform?"
 					+ "\nInput 1 to search PIRs"
-					+ "\nInput 2 to show all PIRs"
-					+ "\nInput 3 to create a new PIR"
+					+ "\nInput 2 to create a new PIR"
+					+ "\nInput 3 to manage PIR"
 					+ "\nInput 0 to quit");
 			option = myObj.nextInt();
-			
 			
 			if (option == 1) {
 				System.out.println("Which type of PIR you want to search?"
@@ -50,8 +49,7 @@ public class PIM_console {
 				option = myObj.nextInt();
 				
 				for(PIR pir:PIRs) {
-		            System.out.println(pir);
-		            System.out.println(pir.toString());
+		            pir.search(filePath);
 		        }
 
 				//option 1.2, print out detailed information about a specific PIR
@@ -60,18 +58,25 @@ public class PIM_console {
 						+ "\nPlease input the PIR's name you want to modify,"
 						+ "\n or enter any char to back.");
 			}
-			else if (option == 2) showAllPIRs();
-			else if (option == 3) {
+			else if (option == 2) {
 				System.out.println("Which type of PIR you want to create?"
 						+ "\nInput 1 for notes"
 						+ "\nInput 2 for tasks"
 						+ "\nInput 3 for events"
 						+ "\nInput 4 for contacts");
 				option = myObj.nextInt();
-				if (option == 1) {}
+				if (option == 1) {
+					Note tempNote = new Note("Quick notes 1");
+
+					PIRs.add(tempNote);
+					savePIRs(filePath, userName, PIRs);
+				}
 				else if (option == 2) {}
 				else if (option == 3) {}
 				else if (option == 4) {}
+			}
+			else if (option == 3) {
+				
 			}
 			else {
 				if (option != 0) System.out.println("Invalid option");
@@ -81,31 +86,28 @@ public class PIM_console {
 		myObj.close();
 	}
 	
-	private static void writeDefaultData(String filePath) {
-		ArrayList<PIR> defaultPIRs = new ArrayList<PIR>();
-		Note aliceNote1 = new Note("Quick notes 1");
-		defaultPIRs.add(aliceNote1);
-		
+	private static void savePIRs(String filePath, String userName, ArrayList<PIR> currentPIRs) {
 		try {
-			File aliceFile = new File(filePath);
-			aliceFile.createNewFile();
+			filePath = filePath.concat(userName).concat(".pim");
+			File f = new File(filePath);
+			if (!f.getParentFile().exists()) f.getParentFile().mkdirs();
+			if (!f.exists()) f.createNewFile();
+
 			FileOutputStream fos = new FileOutputStream(filePath);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(defaultPIRs);
+			oos.writeObject(currentPIRs);
 			oos.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	private static ArrayList<PIR> loadUserPIRs(String userName) {
+		
+	private static ArrayList<PIR> loadPIRs(String filePath, String userName) {
 		ArrayList<PIR> matchedPIRs = null;
 		
-    	File dir = new File("./src/model");
+    	File dir = new File(filePath);
     	File [] files = dir.listFiles(new FilenameFilter() {
     	    @Override
     	    public boolean accept(File dir, String name) {
@@ -133,30 +135,15 @@ public class PIM_console {
     	}
 		return matchedPIRs;
 	}
-		
-	private static void showAllPIRs() {
-		// print out detailed information about all PIRs
-    	File dir = new File("./src/model");
-    	File [] files = dir.listFiles(new FilenameFilter() {
-    	    @Override
-    	    public boolean accept(File dir, String name) {
-    	        return name.endsWith(".pim");
-    	    }
-    	});
-    	
-    	for (File pimfile : files) {
-    	    System.out.println("File name: "+pimfile);
-		    try {
-		        Scanner myReader = new Scanner(pimfile);
-		        while (myReader.hasNextLine()) {
-		          String data = myReader.nextLine();
-		          System.out.println(data);
-		        }
-		        myReader.close();
-		      } catch (FileNotFoundException e) {
-		        System.out.println("An error occurred.");
-		        e.printStackTrace();
-		      }
-    	}
+
+	private static void writeDefaultData(String filePath, String userName) {
+		ArrayList<PIR> defaultPIRs = new ArrayList<PIR>();
+		Note note1 = new Note("Quick notes 1");
+		Task task1 = new Task("Task 1", 20231101);
+		defaultPIRs.add(note1);
+		defaultPIRs.add(task1);
+
+		savePIRs(filePath, userName, defaultPIRs);
 	}
+
 }

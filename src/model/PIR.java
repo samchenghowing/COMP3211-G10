@@ -7,12 +7,8 @@ public class PIR implements Serializable{
 
 	// these functions' implementations are the same across all sub classes
 	public void delete(String fileName) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void search(String searchStr) {
-		// TODO Auto-generated method stub
-		
 	}
 }
