@@ -41,43 +41,47 @@ public class PIM_console {
 			option = myObj.nextInt();
 			
 			if (option == 1) {
-				System.out.println("Which type of PIR you want to search?"
+				System.out.println("--------------search--------------"
+						+ "\nWhich type of PIR you want?"
 						+ "\nInput 1 for notes"
 						+ "\nInput 2 for tasks"
 						+ "\nInput 3 for events"
 						+ "\nInput 4 for contacts");
 				option = myObj.nextInt();
 				
+				
 				for(PIR pir:PIRs) {
-		            pir.search(filePath);
+					System.out.println(pir);
+					if (pir.toString().contains("Quick notes")) {
+						//option 1.2, PIR found, print out detailed information about a specific PIR
+						System.out.println("Matched PIR(s) found!"
+								+ "\nPlease input the PIR's name you want to modify,"
+								+ "\n or enter any char to back.");
+					}
 		        }
 
-				//option 1.2, print out detailed information about a specific PIR
-				//option 1.2.1, PIR found
-				System.out.println("Matched PIR(s) found!"
-						+ "\nPlease input the PIR's name you want to modify,"
-						+ "\n or enter any char to back.");
 			}
 			else if (option == 2) {
-				System.out.println("Which type of PIR you want to create?"
+				System.out.println("--------------create--------------"
+						+ "\nWhich type of PIR you want?"
 						+ "\nInput 1 for notes"
 						+ "\nInput 2 for tasks"
 						+ "\nInput 3 for events"
 						+ "\nInput 4 for contacts");
 				option = myObj.nextInt();
+
+
 				if (option == 1) {
 					Note tempNote = new Note("Quick notes 1");
-
+					tempNote.create();
 					PIRs.add(tempNote);
-					savePIRs(filePath, userName, PIRs);
 				}
 				else if (option == 2) {}
 				else if (option == 3) {}
 				else if (option == 4) {}
+				savePIRs(filePath, userName, PIRs);
 			}
-			else if (option == 3) {
-				
-			}
+			else if (option == 3) {}
 			else {
 				if (option != 0) System.out.println("Invalid option");
 			}
@@ -139,9 +143,11 @@ public class PIM_console {
 	private static void writeDefaultData(String filePath, String userName) {
 		ArrayList<PIR> defaultPIRs = new ArrayList<PIR>();
 		Note note1 = new Note("Quick notes 1");
-		Task task1 = new Task("Task 1", 20231101);
+		Note note2 = new Note("Quick notes 2");
+		Note note3 = new Note("YOOOOO");
 		defaultPIRs.add(note1);
-		defaultPIRs.add(task1);
+		defaultPIRs.add(note2);
+		defaultPIRs.add(note3);
 
 		savePIRs(filePath, userName, defaultPIRs);
 	}

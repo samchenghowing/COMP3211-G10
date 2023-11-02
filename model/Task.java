@@ -1,6 +1,7 @@
 package model;
 
-public class Contact extends PIR implements ManagePIR {
+public class Task implements PIR {
+	private Note taskNote;
 
 	@Override
 	public void create() {
@@ -12,6 +13,12 @@ public class Contact extends PIR implements ManagePIR {
 	public void modify() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public PIR searchText(String s) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
