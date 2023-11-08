@@ -1,17 +1,11 @@
-/**
- * 
- */
 package model;
 
-/**
- * 
- */
 public class Note implements PIR {
-	private String noteString;
+	private String noteName;
 	private static int notesCount=0;
 
 	public Note(String string) {
-		setNoteString(string);
+		createNote(string);
 		notesCount++;
 	}
 
@@ -20,32 +14,16 @@ public class Note implements PIR {
 	}
 
 	public String getNoteString() {
-		return noteString;
+		return noteName;
 	}
 
-	public void setNoteString(String noteString) {
-		this.noteString = noteString;
-	}
-
-	public void create() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void modify() {
-		// TODO Auto-generated method stub
-
+	public void createNote(String noteName) {
+		this.noteName = noteName;
 	}
 
 	@Override
 	public String toString() {
-		return "Note [noteString=" + noteString + "]";
-	}
-
-	@Override
-	public PIR searchText(String s) {
-		// TODO Auto-generated method stub
-		return null;
+		return "Note [noteName=" + noteName + "]";
 	}
 	
 }

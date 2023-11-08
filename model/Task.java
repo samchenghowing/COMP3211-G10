@@ -1,24 +1,63 @@
 package model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Task implements PIR {
 	private Note taskNote;
+	private Date deadline; 
+	private static int TasksCount=0; 
 
-	@Override
-	public void create() {
-		// TODO Auto-generated method stub
+	public Task(String description, String deadlineStr) {
+		createTask(description, deadlineStr);
+		TasksCount++;
+	}
 
+	public void createTask(String description, String dateStr) {
+		taskNote = new Note(description);
+		deadline = parseDateStr(dateStr);
+	}
+
+/* if (comparisonResult < 0) System.out.println("The PIR time is before the specified time.");
+ * else if (comparisonResult > 0) System.out.println("The PIR time is after the specified time.");
+ * else System.out.println("The PIR time is equal to the specified time.");
+*/
+	public int compareTime(String dateTimeStr) {
+        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        int comparisonResult = -1;
+        
+        try {
+            Date dateTime = ft.parse(dateTimeStr);
+            comparisonResult = deadline.compareTo(dateTime);
+            return comparisonResult;
+            
+        } catch (ParseException e) {
+            System.out.println("Invalid date format!");
+        }
+        return comparisonResult;
+    }
+	
+	public Date parseDateStr(String dateStr) {
+		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm");
+		Date t = null; 
+		
+		try { 
+			t = ft.parse(dateStr);
+			return t;
+		} catch (ParseException e) { 
+			System.out.println("Unparseable date string: " + ft);
+		}
+		return t;
+	}
+
+	public static int getTasksCount() {
+		return TasksCount;
 	}
 
 	@Override
-	public void modify() {
-		// TODO Auto-generated method stub
-
+	public String toString() {
+		return "Task [taskNote=" + taskNote + ", deadline=" + deadline + "]";
 	}
-
-	@Override
-	public PIR searchText(String s) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 }
