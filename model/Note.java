@@ -25,5 +25,11 @@ public class Note implements PIR {
 	public String toString() {
 		return "Note [noteName=" + noteName + "]";
 	}
+
+	@Override
+	public boolean checkTimeCondition(String timeCondition) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 }

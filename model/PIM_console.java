@@ -8,15 +8,13 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Scanner;
 
 public class PIM_console {
-	private static ArrayList<PIR> PIRs = null;
+	private static ArrayList<PIR> PIRs;
 	private static String userName;
-	private static String filePath;
+	private static String filePath = "./";
 	private static boolean debug = true;
 	
 	public static void main(String[] args) {
@@ -26,15 +24,17 @@ public class PIM_console {
 		
 		if(debug) {
 			userName = "Alice";
-			filePath = "./";
 			writeDefaultData(filePath, userName);
 		}
-		PIRs = loadPIRs(filePath, userName);
-		if (PIRs == null) {
-			// user not exist 
+		while (userName.contains(" ")) {
+			System.out.println("Please input a vaild username (not contain any spaces)");
+			userName = scanner.nextLine();
 		}
+		PIRs = loadPIRs(filePath, userName);
+		System.out.println("Welcome to PIM, " + userName);
 		
-		String option = "";
+		String option = "", searchString = "", indexString = "";
+		boolean foundPIR = false;
 		while (!option.equals("q")) {
 			System.out.println("--------------Menu--------------"
 					+ "\nWhich option you want to perform?"
@@ -52,46 +52,67 @@ public class PIM_console {
 						+ "\nInput 4 for contacts"
 						+ "\nInput 0 to back to menu");
 				option = scanner.nextLine();
-				
-				System.out.println("--------------search(String)--------------"
-						+ "\nInput the text you are looking for "
-						+ "(input blank space to show all PIRs): ");
-				String searchString = scanner.nextLine();
-				
-				if (!(option.equals("1") || option.equals("4"))) {
-					System.out.println("--------------search(Date/time)--------------"
-						+ "\nInput the time condition (in format 'operator date:Time'): "
-						+ "For example, you might enter '= 2023-11-07 09:30' to show "
-						+ "PIR's time equals to the given time, and '> 2023-11-07 09:30'"
-						+ "to show PIR's time larger than the given time and"
-						+ "'< 2023-11-07 09:30' for time smaller than the given time"
-						+ "(input blank space to show all PIRs): ");
-					String timeString = scanner.nextLine();
+
+				foundPIR = false;
+				if (option.equals("1") || option.equals("4")) {
+					System.out.println("--------------search(String)--------------"
+							+ "\nInput the text you are looking for "
+							+ "(input blank space to show all PIRs): ");
+					searchString = scanner.nextLine();
+					
+					for(PIR pir:PIRs) {
+						if (pir.toString().contains(searchString)) {
+							foundPIR = true;
+							System.out.println("index: " + PIRs.indexOf(pir)+ " " + pir);
+						}
+					}
+				}
+				else{
+					System.out.println("--------------search(Date)--------------"
+						+ "\nInput the text you are looking for and the time condition "
+						+ "(in format 'searchStr logicalOps compareOps date:Time'): "
+						+ "\nFor example, you might enter 'abc && = 2023-11-07 09:30' to show "
+						+ "PIR's string contains 'abc' and time equals to the given time, "
+						+ "\nand 'abc || >= 2023-11-07 09:30' to show PIR's string contains 'abc' or"
+						+ " time larger than or equal to the given time (input blank space to show all PIRs): ");
+					searchString = scanner.nextLine();
+					foundPIR = searchPIRs(searchString);
 				}
 				
-				
-				// delete/ modify
-				boolean foundPIR = false;
-				for(PIR pir:PIRs) {
-					if (pir.toString().contains(searchString)) {
-						foundPIR = true;
-						System.out.println("index: " + PIRs.indexOf(pir)+ " " + pir);
-					}
-		        }
 				if (foundPIR) {
 					System.out.println("Matched PIR(s) found!"
-									+ "\nPlease input the PIR's index you want "
-									+ "to delete, or input blank space to menu.");
+									+ "\nPlease input the PIR's index together with option (1=edit, 2=delete) "
+									+ "you want to perform. \nFor example, you might enter '3 1' to edit PIR "
+									+ "with index no.3 or you can input blank space to back to menu.");
 					option = scanner.nextLine();
-					try {
-						int i = Integer.parseInt(option);
-						if (i < PIRs.size() && i > 0) {
-							PIRs.remove(i);
-							System.out.println("PIR" + i + " deleted!");
+					
+					if (option.startsWith("1 ")) {
+						// modify
+						indexString = option.substring(2).trim();
+						if (isNumeric(indexString)) {
+							int i = Integer.parseInt(indexString);
+							if (i < PIRs.size() && i >= 0) {
+								
+								PIRs.set(i, null);
+//								System.out.println("PIR" + i + " deleted!");
+							}
+							else System.out.println("Please input vaild index!");
 						}
-						System.out.println("Please input vaild index!");
-					} catch (NumberFormatException e) {
-						System.out.println("Please input integer index!");
+					}
+					else if (option.startsWith("2 ")) {
+						// delete
+						indexString = option.substring(2).trim();
+						if (isNumeric(indexString)) {
+							int i = Integer.parseInt(indexString);
+							if (i < PIRs.size() && i >= 0) {
+								PIRs.remove(i);
+								System.out.println("PIR" + i + " deleted!");
+							}
+							else System.out.println("Please input vaild index!");
+						}
+					}
+					else {
+						System.out.println("Invalid option");
 					}
 				}
 				else System.out.println("No matched PIR found");
@@ -110,6 +131,7 @@ public class PIM_console {
 					System.out.println("--------------create(notes)--------------"
 							+ "\nInput the text for your quick notes: ");
 					String noteString = scanner.nextLine();
+					
 					Note tempNote = new Note(noteString);
 					PIRs.add(tempNote);
 				}
@@ -117,24 +139,34 @@ public class PIM_console {
 					System.out.println("--------------create(tasks)--------------"
 							+ "\nInput the descriptions for your task: ");
 					String noteString = scanner.nextLine();
+					System.out.println("\nInput the deadline for your task in format (\"yyyy-MM-dd HH:mm\"): ");
+					String deadline = scanner.nextLine();
 					
-					Note tempNote = new Note(noteString);
-					PIRs.add(tempNote);
+					Task tempTask = new Task(noteString, deadline);
+					PIRs.add(tempTask);
 				}
 				else if (option.equals("3")) {
 					System.out.println("--------------create(events)--------------"
-							+ "\nInput the descriptions for your task: ");
+							+ "\nInput the descriptions for your event: ");
 					String noteString = scanner.nextLine();
+					System.out.println("\nInput the starting Time for your event in format (\"yyyy-MM-dd HH:mm\"): ");
+					String startingTime = scanner.nextLine();
+					System.out.println("\nInput the alarm: ");
+					String alarm = scanner.nextLine();
 					
-					Note tempNote = new Note(noteString);
-					PIRs.add(tempNote);
+					Event tempEvent = new Event(noteString, startingTime, alarm);
+					PIRs.add(tempEvent);
 				}
 				else if (option.equals("4")) {
 					System.out.println("--------------create(contacts)--------------"
-							+ "\nInput the descriptions for your task: ");
+							+ "\nInput the name for your contact: ");
 					String noteString = scanner.nextLine();
+					System.out.println("\nInput the address: ");
+					String address = scanner.nextLine();
+					System.out.println("\nInput the mobile number: ");
+					String mobileNumbers = scanner.nextLine();
 					
-					Note tempNote = new Note(noteString);
+					ContactNote tempNote = new ContactNote(noteString, address, mobileNumbers);
 					PIRs.add(tempNote);
 				}
 				savePIRs(filePath, userName, PIRs);
@@ -147,68 +179,47 @@ public class PIM_console {
 		scanner.close();
 	}
 	
-    public static void searchTasks(String searchString) {
+	public static boolean isNumeric(String str) { 
+		try {  
+			Integer.parseInt(str);  
+			return true;
+		} catch(NumberFormatException e){  
+			return false;  
+		}  
+	}
+	
+    public static boolean searchPIRs(String searchString) {
         String[] conditions = new String[2];
+        boolean found = false, operator = false;
         
         if (searchString.contains("&&")) conditions = searchString.split("&&");
-		else if (searchString.contains("||")) conditions = searchString.split("\\|\\|"); 
-		else System.out.println("Invalid search condition.");
+		else if (searchString.contains("||")) {
+			operator = true;
+			conditions = searchString.split("\\|\\|"); 
+		}
+		else {
+			System.out.println("Invalid search condition.");
+			return found;
+		}
 
         String targetDescription = conditions[0].trim();
         String timeCondition = conditions[1].trim();
 
         for (PIR pir : PIRs) {
-            // if (pir.getTaskNote().getDescription().equals(targetDescription) && checkTimeCondition(task, timeCondition)) {
-            //     System.out.println(task.toString());
-            // }
+        	if (operator) {
+        		if (pir.toString().contains(targetDescription) || pir.checkTimeCondition(timeCondition)) {
+	                 System.out.println(pir.toString());
+	                 found = true;
+        		}
+        	}
+        	else {
+        		if (pir.toString().contains(targetDescription) && pir.checkTimeCondition(timeCondition)) {
+	                 System.out.println(pir.toString());
+	                 found = true;
+        		}
+        	}
         }
-    }
-	
-	private static boolean checkTimeCondition(Task task, String timeCondition) {
-        String operator;
-        String dateTimeStr;
-
-        if (timeCondition.contains(">=")) {
-            operator = ">=";
-            dateTimeStr = timeCondition.substring(2).trim();
-        } else if (timeCondition.contains("<=")) {
-            operator = "<=";
-            dateTimeStr = timeCondition.substring(2).trim();
-        } else if (timeCondition.contains("!=")) {
-            operator = "!=";
-            dateTimeStr = timeCondition.substring(2).trim();
-        } else if (timeCondition.contains(">")) {
-            operator = ">";
-            dateTimeStr = timeCondition.substring(1).trim();
-        } else if (timeCondition.contains("<")) {
-            operator = "<";
-            dateTimeStr = timeCondition.substring(1).trim();
-        } else if (timeCondition.contains("=")) {
-            operator = "=";
-            dateTimeStr = timeCondition.substring(1).trim();
-        } else {
-            System.out.println("Invalid operator in time condition.");
-            return false;
-        }
-
-        int comparisonResult = task.compareTime(dateTimeStr);
-
-        if (operator.equals(">=")) {
-            return comparisonResult >= 0;
-        } else if (operator.equals("<=")) {
-            return comparisonResult <= 0;
-        } else if (operator.equals("!=")) {
-            return comparisonResult != 0;
-        } else if (operator.equals(">")) {
-            return comparisonResult > 0;
-        } else if (operator.equals("<")) {
-            return comparisonResult < 0;
-        } else if (operator.equals("=")) {
-            return comparisonResult == 0;
-        } else {
-            System.out.println("Invalid operator in time condition.");
-            return false;
-        }
+		return found;
     }
 
 	private static void savePIRs(String filePath, String userName, ArrayList<PIR> currentPIRs) {
@@ -228,11 +239,12 @@ public class PIM_console {
 			e.printStackTrace();
 		}
 	}
-		
+
 	@SuppressWarnings("unchecked")
 	private static ArrayList<PIR> loadPIRs(String filePath, String userName) {
-		ArrayList<PIR> matchedPIRs = null;
+		ArrayList<PIR> matchedPIRs = new ArrayList<PIR>();
 		
+		// create user data file not exist
     	File dir = new File(filePath);
     	File [] files = dir.listFiles(new FilenameFilter() {
     	    @Override

@@ -18,7 +18,7 @@ public class Task implements PIR {
 		taskNote = new Note(description);
 		deadline = parseDateStr(dateStr);
 	}
-
+	
 /* if (comparisonResult < 0) System.out.println("The PIR time is before the specified time.");
  * else if (comparisonResult > 0) System.out.println("The PIR time is after the specified time.");
  * else System.out.println("The PIR time is equal to the specified time.");
@@ -38,6 +38,53 @@ public class Task implements PIR {
         return comparisonResult;
     }
 	
+	public boolean checkTimeCondition(String timeCondition) {
+        String operator;
+        String dateTimeStr;
+
+        if (timeCondition.contains(">=")) {
+            operator = ">=";
+            dateTimeStr = timeCondition.substring(2).trim();
+        } else if (timeCondition.contains("<=")) {
+            operator = "<=";
+            dateTimeStr = timeCondition.substring(2).trim();
+        } else if (timeCondition.contains("!=")) {
+            operator = "!=";
+            dateTimeStr = timeCondition.substring(2).trim();
+        } else if (timeCondition.contains(">")) {
+            operator = ">";
+            dateTimeStr = timeCondition.substring(1).trim();
+        } else if (timeCondition.contains("<")) {
+            operator = "<";
+            dateTimeStr = timeCondition.substring(1).trim();
+        } else if (timeCondition.contains("=")) {
+            operator = "=";
+            dateTimeStr = timeCondition.substring(1).trim();
+        } else {
+            System.out.println("Invalid operator in time condition.");
+            return false;
+        }
+
+        int comparisonResult = compareTime(dateTimeStr);
+
+        if (operator.equals(">=")) {
+            return comparisonResult >= 0;
+        } else if (operator.equals("<=")) {
+            return comparisonResult <= 0;
+        } else if (operator.equals("!=")) {
+            return comparisonResult != 0;
+        } else if (operator.equals(">")) {
+            return comparisonResult > 0;
+        } else if (operator.equals("<")) {
+            return comparisonResult < 0;
+        } else if (operator.equals("=")) {
+            return comparisonResult == 0;
+        } else {
+            System.out.println("Invalid operator in time condition.");
+            return false;
+        }
+    }
+
 	public Date parseDateStr(String dateStr) {
 		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm");
 		Date t = null; 

@@ -31,5 +31,11 @@ public class Event implements PIR {
 	public String toString() {
 		return "Event [eventTask=" + eventTask + ", alarm=" + alarm + "]";
 	}
+
+	@Override
+	public boolean checkTimeCondition(String timeCondition) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 }
