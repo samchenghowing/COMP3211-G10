@@ -49,8 +49,7 @@ public class PIM_console {
 						+ "\nInput 1 for notes"
 						+ "\nInput 2 for tasks"
 						+ "\nInput 3 for events"
-						+ "\nInput 4 for contacts"
-						+ "\nInput 0 to back to menu");
+						+ "\nInput 4 for contacts");
 				option = scanner.nextLine();
 
 				foundPIR = false;
@@ -58,8 +57,8 @@ public class PIM_console {
 					System.out.println("--------------search(String)--------------"
 							+ "\nInput the text you are looking for "
 							+ "(input blank space to show all PIRs): ");
-					searchString = scanner.nextLine();
 					
+					searchString = scanner.nextLine();
 					for(PIR pir:PIRs) {
 						if (pir.toString().contains(searchString)) {
 							foundPIR = true;
@@ -67,7 +66,7 @@ public class PIM_console {
 						}
 					}
 				}
-				else{
+				else if (option.equals("2") || option.equals("3")) {
 					System.out.println("--------------search(Date)--------------"
 						+ "\nInput the text you are looking for and the time condition "
 						+ "(in format 'searchStr logicalOps compareOps date:Time'): "
@@ -92,9 +91,52 @@ public class PIM_console {
 						if (isNumeric(indexString)) {
 							int i = Integer.parseInt(indexString);
 							if (i < PIRs.size() && i >= 0) {
-								
-								PIRs.set(i, null);
-//								System.out.println("PIR" + i + " deleted!");
+								System.out.println("Current info:"+PIRs.get(i));
+								if (PIRs.get(i) instanceof Note) {
+									if (PIRs.get(i) instanceof ContactNote) {
+										System.out.println("--------------edit(cantact)--------------"
+												+ "\nInput the name for your contact: ");
+										String noteString = scanner.nextLine();
+										System.out.println("\nInput the address: ");
+										String address = scanner.nextLine();
+										System.out.println("\nInput the mobile number: ");
+										String mobileNumbers = scanner.nextLine();
+										
+										ContactNote tempNote = new ContactNote(noteString, address, mobileNumbers);
+										PIRs.set(i, tempNote);
+									}
+									else {
+										System.out.println("--------------edit(notes)--------------"
+												+ "\nInput the text for your quick notes: ");
+										String noteString = scanner.nextLine();
+										Note tempNote = new Note(noteString);
+										PIRs.set(i, tempNote);
+									}
+									
+								}
+								else if (PIRs.get(i) instanceof Task) {
+									System.out.println("--------------edit(tasks)--------------"
+											+ "\nInput the descriptions for your task: ");
+									String noteString = scanner.nextLine();
+									System.out.println("\nInput the deadline for your task in format (\"yyyy-MM-dd HH:mm\"): ");
+									String deadline = scanner.nextLine();
+									
+									Task tempTask = new Task(noteString, deadline);
+									PIRs.set(i, tempTask);
+								}
+								else if (PIRs.get(i) instanceof Event) {
+									System.out.println("--------------edit(event)--------------"
+											+ "\nInput the descriptions for your event: ");
+									String noteString = scanner.nextLine();
+									System.out.println("\nInput the starting Time for your event in format (\"yyyy-MM-dd HH:mm\"): ");
+									String startingTime = scanner.nextLine();
+									System.out.println("\nInput the alarm: ");
+									String alarm = scanner.nextLine();
+									
+									Event tempEvent = new Event(noteString, startingTime, alarm);
+									PIRs.set(i, tempEvent);
+								}
+								System.out.println("PIR" + i + " modified!");
 							}
 							else System.out.println("Please input vaild index!");
 						}

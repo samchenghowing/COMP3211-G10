@@ -34,8 +34,7 @@ public class Event implements PIR {
 
 	@Override
 	public boolean checkTimeCondition(String timeCondition) {
-		// TODO Auto-generated method stub
-		return false;
+		return eventTask.checkTimeCondition(timeCondition);
 	}
 	
 }
