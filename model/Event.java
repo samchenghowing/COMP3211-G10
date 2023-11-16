@@ -1,5 +1,6 @@
 package model;
 
+@SuppressWarnings("serial")
 public class Event implements PIR {
 	private Task eventTask;
 	private String alarm;

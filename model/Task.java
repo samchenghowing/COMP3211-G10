@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@SuppressWarnings("serial")
 public class Task implements PIR {
 	private Note taskNote;
 	private Date deadline; 
@@ -61,7 +62,7 @@ public class Task implements PIR {
             operator = "=";
             dateTimeStr = timeCondition.substring(1).trim();
         } else {
-            System.out.println("Invalid operator in time condition.");
+            //System.out.println("Invalid operator in time condition.");
             return false;
         }
 
@@ -80,20 +81,21 @@ public class Task implements PIR {
         } else if (operator.equals("=")) {
             return comparisonResult == 0;
         } else {
-            System.out.println("Invalid operator in time condition.");
+            //System.out.println("Invalid operator in time condition.");
             return false;
         }
     }
 
 	public Date parseDateStr(String dateStr) {
 		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm");
-		Date t = null; 
+		Date t = new Date();
 		
 		try { 
 			t = ft.parse(dateStr);
 			return t;
 		} catch (ParseException e) { 
-			System.out.println("Unparseable date string: " + ft);
+			System.out.println("Unparseable date string: " + ft.toString()
+					+ " the date is seted to today");
 		}
 		return t;
 	}

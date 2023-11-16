@@ -1,5 +1,6 @@
 package model;
 
+@SuppressWarnings("serial")
 public class Note implements PIR {
 	private String noteName;
 	private static int notesCount=0;

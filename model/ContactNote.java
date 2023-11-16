@@ -1,5 +1,6 @@
 package model;
 
+@SuppressWarnings("serial")
 public class ContactNote extends Note {
 	private String address;
 	private String mobileNumbers;
