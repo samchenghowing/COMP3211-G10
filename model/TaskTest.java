@@ -10,7 +10,9 @@ class TaskTest {
 	void compareTimetest() {
 		assertTrue(testTask.checkTimeCondition("=2023-11-07 09:30"));
 		assertTrue(testTask.checkTimeCondition(">=2023-11-07 09:30"));
-		assertTrue(testTask.checkTimeCondition("<=2023-11-07 09:30"));		
+		assertTrue(testTask.checkTimeCondition("<=2023-11-07 09:30"));	
+		assertTrue(!testTask.checkTimeCondition(">2023-11-07 09:30"));	
+		assertTrue(!testTask.checkTimeCondition("<2023-11-07 09:30"));
 	}
 
 }

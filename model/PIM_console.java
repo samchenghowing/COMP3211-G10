@@ -8,7 +8,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
 
 public class PIM_console {
@@ -84,48 +87,20 @@ public class PIM_console {
 							int i = Integer.parseInt(indexString);
 							if (i < PIRs.size() && i >= 0) {
 								System.out.println("Current info:"+PIRs.get(i));
-								if (PIRs.get(i) instanceof Note) {
-									if (PIRs.get(i) instanceof ContactNote) {
-										System.out.println("--------------edit(cantact)--------------"
-												+ "\nInput the name for your contact: ");
-										String noteString = scanner.nextLine();
-										System.out.println("\nInput the address: ");
-										String address = scanner.nextLine();
-										System.out.println("\nInput the mobile number: ");
-										String mobileNumbers = scanner.nextLine();
-										
-										ContactNote tempNote = new ContactNote(noteString, address, mobileNumbers);
-										PIRs.set(i, tempNote);
-									}
-									else {
-										System.out.println("--------------edit(notes)--------------"
-												+ "\nInput the text for your quick notes: ");
-										String noteString = scanner.nextLine();
-										Note tempNote = new Note(noteString);
-										PIRs.set(i, tempNote);
-									}
-									
+								if (PIRs.get(i) instanceof ContactNote) {
+									ContactNote tempNote = setContact("edit");
+									PIRs.set(i, tempNote);
+								}
+								else if (PIRs.get(i) instanceof Note) {
+									Note tempNote = setNote("edit");
+									PIRs.set(i, tempNote);
 								}
 								else if (PIRs.get(i) instanceof Task) {
-									System.out.println("--------------edit(tasks)--------------"
-											+ "\nInput the descriptions for your task: ");
-									String noteString = scanner.nextLine();
-									System.out.println("\nInput the deadline for your task in format (\"yyyy-MM-dd HH:mm\"): ");
-									String deadline = scanner.nextLine();
-									
-									Task tempTask = new Task(noteString, deadline);
+									Task tempTask = setTask("edit");
 									PIRs.set(i, tempTask);
 								}
 								else if (PIRs.get(i) instanceof Event) {
-									System.out.println("--------------edit(event)--------------"
-											+ "\nInput the descriptions for your event: ");
-									String noteString = scanner.nextLine();
-									System.out.println("\nInput the starting Time for your event in format (\"yyyy-MM-dd HH:mm\"): ");
-									String startingTime = scanner.nextLine();
-									System.out.println("\nInput the alarm: ");
-									String alarm = scanner.nextLine();
-									
-									Event tempEvent = new Event(noteString, startingTime, alarm);
+									Event tempEvent = setEvent("edit");
 									PIRs.set(i, tempEvent);
 								}
 								System.out.println("PIR" + i + " modified!");
@@ -162,44 +137,19 @@ public class PIM_console {
 				option = scanner.nextLine();
 				
 				if (option.equals("1")) {
-					System.out.println("--------------create(notes)--------------"
-							+ "\nInput the text for your quick notes: ");
-					String noteString = scanner.nextLine();
-					
-					Note tempNote = new Note(noteString);
+					Note tempNote = setNote("create");
 					PIRs.add(tempNote);
 				}
 				else if (option.equals("2")) {
-					System.out.println("--------------create(tasks)--------------"
-							+ "\nInput the descriptions for your task: ");
-					String noteString = scanner.nextLine();
-					System.out.println("\nInput the deadline for your task in format (\"yyyy-MM-dd HH:mm\"): ");
-					String deadline = scanner.nextLine();
-					Task tempTask = new Task(noteString, deadline);
+					Task tempTask = setTask("create");
 					PIRs.add(tempTask);
 				}
 				else if (option.equals("3")) {
-					System.out.println("--------------create(events)--------------"
-							+ "\nInput the descriptions for your event: ");
-					String noteString = scanner.nextLine();
-					System.out.println("\nInput the starting Time for your event in format (\"yyyy-MM-dd HH:mm\"): ");
-					String startingTime = scanner.nextLine();
-					System.out.println("\nInput the alarm: ");
-					String alarm = scanner.nextLine();
-					
-					Event tempEvent = new Event(noteString, startingTime, alarm);
+					Event tempEvent = setEvent("create");
 					PIRs.add(tempEvent);
 				}
 				else if (option.equals("4")) {
-					System.out.println("--------------create(contacts)--------------"
-							+ "\nInput the name for your contact: ");
-					String noteString = scanner.nextLine();
-					System.out.println("\nInput the address: ");
-					String address = scanner.nextLine();
-					System.out.println("\nInput the mobile number: ");
-					String mobileNumbers = scanner.nextLine();
-					
-					ContactNote tempNote = new ContactNote(noteString, address, mobileNumbers);
+					ContactNote tempNote = setContact("create");
 					PIRs.add(tempNote);
 				}
 				savePIRs(filePath, userName, PIRs);
@@ -211,6 +161,90 @@ public class PIM_console {
 		System.out.println("Bye");
 		scanner.close();
 	}
+
+	public static Event setEvent(String mode) {
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("--------------"+mode+"(events)--------------"
+				+ "\nInput the descriptions for your event: ");
+		String noteString = scanner.nextLine();
+		
+		System.out.println("\nInput the starting Time for your event in format (\"yyyy-MM-dd HH:mm\"): ");
+		String startingTimeStr = scanner.nextLine();
+		while (parseDateStr(startingTimeStr) == null) {
+			System.out.println("\nThe starting Time format is not correct, please input again: (\"yyyy-MM-dd HH:mm\"): ");
+			startingTimeStr = scanner.nextLine();
+		}
+		Date startingTime = parseDateStr(startingTimeStr);
+		
+		System.out.println("\nInput the alarm: ");
+		String alarm = scanner.nextLine();
+		while (!isNumeric(alarm)) {
+			System.out.println("\nThe alarm should be integer, please input again: ");
+			alarm = scanner.nextLine();
+		}
+		Event tempEvent = new Event(noteString, startingTime, alarm);
+		return tempEvent;
+	}
+	
+	public static ContactNote setContact(String mode) {
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("--------------create(contacts)--------------"
+				+ "\nInput the name for your contact: ");
+		String noteString = scanner.nextLine();
+		System.out.println("\nInput the address: ");
+		String address = scanner.nextLine();
+		System.out.println("\nInput the mobile number: ");
+		String mobileNumbers = scanner.nextLine();
+		while (!isNumeric(mobileNumbers)) {
+			System.out.println("\nThe mobile number should be integer, please input again: ");
+			mobileNumbers = scanner.nextLine();
+		}
+		ContactNote tempNote = new ContactNote(noteString, address, mobileNumbers);
+		return tempNote;
+	}
+	
+	public static Task setTask(String mode) {
+		Scanner scanner = new Scanner(System.in);
+		
+		System.out.println("--------------"+mode+"(tasks)--------------"
+				+ "\nInput the descriptions for your task: ");
+		String noteString = scanner.nextLine();
+		
+		System.out.println("\nInput the deadline for your task in format (\"yyyy-MM-dd HH:mm\"): ");
+		String deadlineStr = scanner.nextLine();
+		while (parseDateStr(deadlineStr) == null) {
+			System.out.println("\nThe deadline format is not correct, please input again: (\"yyyy-MM-dd HH:mm\"): ");
+			deadlineStr = scanner.nextLine();
+		}
+		Date deadline = parseDateStr(deadlineStr);
+		Task tempTask = new Task(noteString, deadline);
+		
+		return tempTask;
+	}
+	
+	public static Note setNote(String mode) {
+		Scanner scanner = new Scanner(System.in);
+		
+		System.out.println("--------------"+mode+"(notes)--------------"
+				+ "\nInput the text for your quick notes: ");
+		String noteString = scanner.nextLine();
+		Note tempNote = new Note(noteString);
+		
+		return tempNote;
+	}
+	
+	public static Date parseDateStr(String dateStr) {
+		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm");
+		Date t = null;
+		
+		try { 
+			t = ft.parse(dateStr);
+			return t;
+		} catch (ParseException e) { 
+//			System.out.println("Unparseable date string: " + ft.toString());
+		}
+		return t;
+	}	
 	
 	public static boolean isNumeric(String str) { 
 		try {  

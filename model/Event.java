@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Date;
+
 @SuppressWarnings("serial")
 public class Event implements PIR {
 	private Task eventTask;
@@ -11,10 +13,22 @@ public class Event implements PIR {
 		eventsCount++;
 	}
 
+	public Event(String description, Date startingTime, String alarmStr) {
+		createEvent(description, startingTime, alarmStr);
+		eventsCount++;
+	}
+	
 	private void createEvent(String description, String startingTime, String alarmStr) {
 		eventTask = new Task(description, startingTime);
 		setAlarm(alarmStr);
 	}
+
+
+	private void createEvent(String description, Date startingTime, String alarmStr) {
+		eventTask = new Task(description, startingTime);
+		setAlarm(alarmStr);
+	}
+
 
 	public String getAlarm() {
 		return alarm;

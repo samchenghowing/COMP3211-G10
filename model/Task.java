@@ -14,10 +14,19 @@ public class Task implements PIR {
 		createTask(description, deadlineStr);
 		TasksCount++;
 	}
+	public Task(String description, Date deadlineStr) {
+		createTask(description, deadlineStr);
+		TasksCount++;
+	}
 
 	public void createTask(String description, String dateStr) {
 		taskNote = new Note(description);
 		deadline = parseDateStr(dateStr);
+	}
+
+	public void createTask(String description, Date date) {
+		taskNote = new Note(description);
+		deadline = date;
 	}
 	
 /* if (comparisonResult < 0) System.out.println("The PIR time is before the specified time.");
@@ -38,6 +47,7 @@ public class Task implements PIR {
         }
         return comparisonResult;
     }
+	
 	
 	public boolean checkTimeCondition(String timeCondition) {
         String operator;
@@ -88,14 +98,13 @@ public class Task implements PIR {
 
 	public Date parseDateStr(String dateStr) {
 		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm");
-		Date t = new Date();
+		Date t = null;
 		
 		try { 
 			t = ft.parse(dateStr);
 			return t;
 		} catch (ParseException e) { 
-			System.out.println("Unparseable date string: " + ft.toString()
-					+ " the date is seted to today");
+//			System.out.println("Unparseable date string: " + ft.toString());
 		}
 		return t;
 	}
